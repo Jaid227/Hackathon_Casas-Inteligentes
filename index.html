@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
-  <title>Eficiencia Energética · Gestión de Aparatos</title>
+  <title>⚡ Análisis Energético · Hackathon</title>
   <!-- ========== CSS ========== -->
   <style>
     /* ----- variables claras / oscuras ----- */
@@ -63,7 +64,7 @@
       align-items: center;
     }
     .app-container {
-      max-width: 1200px;
+      max-width: 1400px;
       width: 100%;
     }
 
@@ -139,11 +140,49 @@
       color: var(--text-muted);
       border: 1px solid var(--border-color);
     }
+    .card-title .toggle-advanced {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 400;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .card-title .toggle-advanced input {
+      width: 40px;
+      height: 22px;
+      border-radius: 20px;
+      background: var(--border-color);
+      appearance: none;
+      cursor: pointer;
+      position: relative;
+      transition: 0.3s;
+      flex-shrink: 0;
+    }
+    .card-title .toggle-advanced input:checked {
+      background: var(--accent);
+    }
+    .card-title .toggle-advanced input::before {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: white;
+      top: 2px;
+      left: 2px;
+      transition: 0.3s;
+    }
+    .card-title .toggle-advanced input:checked::before {
+      left: 20px;
+    }
 
     /* ----- grid formulario ----- */
     .form-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 1.2rem 1.5rem;
       margin-bottom: 1.8rem;
     }
@@ -154,10 +193,14 @@
     }
     .form-group label {
       font-weight: 500;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: var(--text-muted);
       letter-spacing: 0.02em;
       text-transform: uppercase;
+    }
+    .form-group label .required {
+      color: var(--danger);
+      margin-left: 2px;
     }
     .form-group input, .form-group select {
       background: var(--bg-input);
@@ -179,6 +222,20 @@
       color: var(--text-muted);
       margin-top: 0.2rem;
     }
+    .form-group .info-text .advanced-badge {
+      background: var(--bg-input);
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.6rem;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+    }
+    .form-group.advanced-field {
+      display: none;
+    }
+    .form-group.advanced-field.visible {
+      display: flex;
+    }
 
     /* ----- botones ----- */
     .btn-primary {
@@ -186,7 +243,7 @@
       border: none;
       color: white;
       font-weight: 600;
-      padding: 0.8rem 1.8rem;
+      padding: 0.8rem 2rem;
       border-radius: 40px;
       font-size: 1rem;
       cursor: pointer;
@@ -393,9 +450,9 @@
     .badge-ineficiente { background: var(--badge-ineficiente); color: white; }
 
     .result-stats {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1.8rem 3rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1.2rem;
       margin: 1.2rem 0 0.8rem;
     }
     .stat-item {
@@ -426,19 +483,30 @@
       color: var(--text-secondary);
     }
 
+    .observations-list {
+      margin: 1rem 0 0.2rem;
+      padding-left: 1.2rem;
+      list-style: square;
+    }
+    .observations-list li {
+      margin-bottom: 0.35rem;
+      color: var(--warning);
+      font-size: 0.9rem;
+    }
+
     .json-output {
       background: var(--bg-input);
       border-radius: 16px;
       padding: 1.2rem 1.5rem;
       margin-top: 1rem;
       font-family: 'Monaco', 'Menlo', monospace;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       overflow-x: auto;
       white-space: pre-wrap;
       word-break: break-word;
       border: 1px solid var(--border-color);
       color: var(--text-secondary);
-      max-height: 200px;
+      max-height: 300px;
       overflow-y: auto;
     }
 
@@ -503,7 +571,7 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
     .datos-reales-info .info-item strong {
       color: var(--text-primary);
@@ -543,20 +611,33 @@
       to { transform: translateY(0); opacity: 1; }
     }
 
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid var(--border-color);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
     /* ----- responsive ----- */
     @media (max-width: 600px) {
-      .app-header h1 { font-size: 1.5rem; }
-      .card { padding: 1.2rem; }
+      .app-header h1 { font-size: 1.3rem; }
+      .card { padding: 1rem; }
       .form-grid { grid-template-columns: 1fr; }
-      .result-stats { flex-direction: column; gap: 0.8rem; }
+      .result-stats { grid-template-columns: 1fr; }
       .historial-item { flex-direction: column; align-items: stretch; }
       .historial-item .h-info { flex-direction: column; align-items: flex-start; gap: 0.3rem; }
       .aparatos-table th, .aparatos-table td {
-        padding: 0.4rem 0.5rem;
-        font-size: 0.8rem;
+        padding: 0.3rem 0.4rem;
+        font-size: 0.75rem;
       }
-      .aparatos-table .input-consumo { width: 60px; }
-      .aparatos-table .input-cantidad { width: 50px; }
+      .aparatos-table .input-consumo { width: 55px; }
+      .aparatos-table .input-cantidad { width: 45px; }
       .datos-reales-info { flex-direction: column; align-items: stretch; }
       .toast { max-width: 90%; right: 10px; bottom: 10px; }
     }
@@ -567,144 +648,316 @@
 
   <!-- header + toggle -->
   <header class="app-header">
-    <h1>⚡ Análisis Energético</h1>
+    <h1>⚡ Análisis Energético · Hackathon</h1>
     <div class="theme-toggle" id="themeToggle" role="button" tabindex="0" aria-label="Cambiar tema">
       <span id="themeIcon">🌙</span>
       <span id="themeLabel">Nocturno</span>
     </div>
   </header>
 
-  <!-- tarjeta de entrada -->
+  <!-- tarjeta de entrada principal -->
   <section class="card">
-    <div class="card-title">📊 Datos de consumo</div>
+    <div class="card-title">
+      📊 Datos del Inmueble
+      <span class="badge-count" id="versionInfo">v1.0</span>
+      <label class="toggle-advanced">
+        <span>🔵 Modo Avanzado</span>
+        <input type="checkbox" id="advancedToggle">
+      </label>
+    </div>
+    
+    <!-- Campos obligatorios del brief -->
     <div class="form-grid">
       <div class="form-group">
-        <label>Horas pico (uso intenso)</label>
-        <input type="number" id="horasPico" value="5" step="0.5" min="0">
-        <span class="info-text">⏰ Horas al día de mayor consumo eléctrico</span>
+        <label>tipo_inmueble <span class="required">*</span></label>
+        <select id="tipoInmueble">
+          <option value="Casa">Casa</option>
+          <option value="Departamento">Departamento</option>
+          <option value="Oficina">Oficina</option>
+          <option value="Comercio">Comercio</option>
+          <option value="Industrial">Industrial</option>
+        </select>
+        <span class="info-text">🟢 Obligatorio · Segmenta el análisis</span>
       </div>
       <div class="form-group">
-        <label>Perfil de uso</label>
-        <select id="perfilUso">
-          <option value="hogar">Hogar</option>
-          <option value="oficina">Oficina</option>
-          <option value="comercio" selected>Comercio</option>
-          <option value="mixto">Mixto</option>
+        <label>consumo_kwh <span class="required">*</span></label>
+        <input type="number" id="consumoKwh" value="420" step="1" min="0">
+        <span class="info-text">🟢 Obligatorio · Consumo mensual total en kWh</span>
+      </div>
+      <div class="form-group">
+        <label>uso_horario_pico <span class="required">*</span></label>
+        <select id="usoHorarioPico">
+          <option value="true">Sí</option>
+          <option value="false" selected>No</option>
         </select>
+        <span class="info-text">🟢 Obligatorio · ¿El mayor consumo ocurre en horario punta?</span>
+      </div>
+      <div class="form-group">
+        <label>horas_alto_consumo <span class="required">*</span></label>
+        <input type="number" id="horasAltoConsumo" value="6" step="0.5" min="0">
+        <span class="info-text">🟢 Obligatorio · Horas diarias con carga eléctrica elevada</span>
+      </div>
+    </div>
+
+    <!-- Campos opcionales simples -->
+    <div class="form-grid">
+      <div class="form-group">
+        <label>mes 🟡</label>
+        <select id="mes">
+          <option value="Enero">Enero</option>
+          <option value="Febrero">Febrero</option>
+          <option value="Marzo">Marzo</option>
+          <option value="Abril">Abril</option>
+          <option value="Mayo">Mayo</option>
+          <option value="Junio">Junio</option>
+          <option value="Julio" selected>Julio</option>
+          <option value="Agosto">Agosto</option>
+          <option value="Septiembre">Septiembre</option>
+          <option value="Octubre">Octubre</option>
+          <option value="Noviembre">Noviembre</option>
+          <option value="Diciembre">Diciembre</option>
+        </select>
+        <span class="info-text">🟡 Simple · Estacionalidad del consumo</span>
+      </div>
+      <div class="form-group">
+        <label>region_pais 🟡</label>
+        <select id="regionPais">
+          <option value="">Seleccionar</option>
+          <option value="Costa">Costa</option>
+          <option value="Sierra">Sierra</option>
+          <option value="Selva">Selva</option>
+          <option value="Norte">Norte</option>
+          <option value="Centro">Centro</option>
+          <option value="Sur">Sur</option>
+        </select>
+        <span class="info-text">🟡 Simple · Ajusta consumo según clima</span>
+      </div>
+      <div class="form-group">
+        <label>superficie_m2 🟡</label>
+        <input type="number" id="superficieM2" value="120" step="1" min="0">
+        <span class="info-text">🟡 Simple · Normaliza consumo (kWh/m²)</span>
+      </div>
+      <div class="form-group">
+        <label>habitantes_ocupantes 🟡</label>
+        <input type="number" id="habitantes" value="4" step="1" min="0">
+        <span class="info-text">🟡 Simple · Explica consumo por ocupación</span>
+      </div>
+      <div class="form-group">
+        <label>es_casa_inteligente 🟡</label>
+        <select id="casaInteligente">
+          <option value="true">Sí</option>
+          <option value="false" selected>No</option>
+        </select>
+        <span class="info-text">🟡 Simple · Automatización general</span>
+      </div>
+      <div class="form-group">
+        <label>tiene_sensores_iot 🟡</label>
+        <select id="sensoresIot">
+          <option value="true">Sí</option>
+          <option value="false" selected>No</option>
+        </select>
+        <span class="info-text">🟡 Simple · Monitoreo/submedición</span>
+      </div>
+      <div class="form-group">
+        <label>mantenimiento_general_al_dia 🟡</label>
+        <select id="mantenimientoGeneral">
+          <option value="true">Sí</option>
+          <option value="false" selected>No</option>
+        </select>
+        <span class="info-text">🟡 Simple · Mantenimiento vigente</span>
+      </div>
+      <div class="form-group">
+        <label>tiene_paneles_solares 🟡</label>
+        <select id="panelesSolares">
+          <option value="true">Sí</option>
+          <option value="false" selected>No</option>
+        </select>
+        <span class="info-text">🟡 Simple · Autogeneración de energía</span>
+      </div>
+      <div class="form-group">
+        <label>tiene_cargador_ve 🟡</label>
+        <select id="cargadorVe">
+          <option value="true">Sí</option>
+          <option value="false" selected>No</option>
+        </select>
+        <span class="info-text">🟡 Simple · Infraestructura de electromovilidad</span>
+      </div>
+    </div>
+
+    <!-- Campos avanzados -->
+    <div class="form-grid" id="advancedFields">
+      <div class="form-group advanced-field">
+        <label>factor_potencia 🔵</label>
+        <input type="number" id="factorPotencia" value="0.86" step="0.01" min="0.70" max="0.98">
+        <span class="info-text"><span class="advanced-badge">🔵 Avanzado</span> Calidad de la energía consumida</span>
+      </div>
+      <div class="form-group advanced-field">
+        <label>capacidad_solar_kwp 🔵</label>
+        <input type="number" id="capacidadSolar" value="3.5" step="0.1" min="0">
+        <span class="info-text"><span class="advanced-badge">🔵 Avanzado</span> Potencia instalada en paneles solares</span>
+      </div>
+      <div class="form-group advanced-field">
+        <label>tiene_baterias 🔵</label>
+        <select id="tieneBaterias">
+          <option value="true">Sí</option>
+          <option value="false" selected>No</option>
+        </select>
+        <span class="info-text"><span class="advanced-badge">🔵 Avanzado</span> Almacenamiento de energía limpia</span>
+      </div>
+      <div class="form-group advanced-field">
+        <label>tipo_conexion 🔵</label>
+        <select id="tipoConexion">
+          <option value="Monofásico" selected>Monofásico</option>
+          <option value="Trifásico">Trifásico</option>
+        </select>
+        <span class="info-text"><span class="advanced-badge">🔵 Avanzado</span> Mayor carga instalada en trifásico</span>
+      </div>
+      <div class="form-group advanced-field">
+        <label>distribuidora_electrica 🔵</label>
+        <input type="text" id="distribuidora" value="Luz del Sur" placeholder="Nombre de la distribuidora">
+        <span class="info-text"><span class="advanced-badge">🔵 Avanzado</span> Identifica empresa distribuidora</span>
+      </div>
+      <div class="form-group advanced-field">
+        <label>usa_tarifa_personalizada 🔵</label>
+        <select id="usaTarifaPersonalizada">
+          <option value="false" selected>No</option>
+          <option value="true">Sí</option>
+        </select>
+        <span class="info-text"><span class="advanced-badge">🔵 Avanzado</span> Usar tarifa real del usuario</span>
+      </div>
+      <div class="form-group advanced-field">
+        <label>tarifa_kwh_personalizada 🔵</label>
+        <input type="number" id="tarifaPersonalizada" value="0.68" step="0.01" min="0">
+        <span class="info-text"><span class="advanced-badge">🔵 Avanzado</span> Tarifa real ingresada por el usuario</span>
+      </div>
+    </div>
+
+    <!-- País y datos reales -->
+    <div style="margin-top: 0.5rem;">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>pais <span class="required">*</span></label>
+          <select id="paisSelect">
+            <option value="Peru">Perú</option>
+            <option value="Brasil">Brasil</option>
+            <option value="Mexico">México</option>
+            <option value="Espana">España</option>
+            <option value="Argentina">Argentina</option>
+            <option value="Colombia">Colombia</option>
+            <option value="Chile">Chile</option>
+            <option value="Estados Unidos">Estados Unidos</option>
+            <option value="Alemania">Alemania</option>
+            <option value="Francia">Francia</option>
+            <option value="Reino Unido">Reino Unido</option>
+          </select>
+          <span class="info-text">🟢 Obligatorio · Determina tarifa y normativa</span>
+        </div>
+        <div class="form-group">
+          <label>Año de referencia</label>
+          <select id="anioSelect">
+            <option value="2020">2020</option>
+            <option value="2021">2021</option>
+            <option value="2022" selected>2022</option>
+            <option value="2023">2023</option>
+          </select>
+        </div>
+        <div class="form-group" style="justify-content: flex-end;">
+          <button class="btn-info" id="actualizarDatosBtn">🔄 Actualizar datos reales</button>
+        </div>
+      </div>
+      <div class="datos-reales-info" id="datosRealesInfo">
+        <div class="info-item">📊 Consumo anual: <strong id="consumoAnual">1.500</strong> kWh</div>
+        <div class="info-item">📈 Promedio mensual: <strong id="promedioMensual">125</strong> kWh</div>
+        <div class="info-item">💰 Tarifa: <strong id="tarifaPais">PEN 0.60</strong> / kWh</div>
+        <div class="info-item">🪙 Moneda: <strong id="monedaPais">PEN</strong></div>
+        <div class="info-item">🌍 Factor CO₂: <strong id="factorCO2">0.28</strong> kg/kWh</div>
       </div>
     </div>
   </section>
 
-  <!-- tarjeta de datos reales por país -->
+  <!-- Tarjeta de Zonas y Equipos (simplificada) -->
   <section class="card">
     <div class="card-title">
-      🌍 Datos reales por país
-      <span class="badge-count" id="paisActual">Brasil 2023</span>
-    </div>
-    <div class="form-grid">
-      <div class="form-group">
-        <label>País</label>
-        <select id="paisSelect">
-          <option value="Brasil">Brasil</option>
-          <option value="México">México</option>
-          <option value="España">España</option>
-          <option value="Argentina">Argentina</option>
-          <option value="Colombia">Colombia</option>
-          <option value="Chile">Chile</option>
-          <option value="Perú">Perú</option>
-          <option value="Estados Unidos">Estados Unidos</option>
-          <option value="Alemania">Alemania</option>
-          <option value="Francia">Francia</option>
-          <option value="Reino Unido">Reino Unido</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Año</label>
-        <select id="anioSelect">
-          <option value="2020">2020</option>
-          <option value="2021">2021</option>
-          <option value="2022" selected>2022</option>
-          <option value="2023">2023</option>
-        </select>
-      </div>
-      <div class="form-group" style="justify-content: flex-end;">
-        <button class="btn-info" id="actualizarDatosBtn">🔄 Actualizar datos reales</button>
-      </div>
-    </div>
-    <div class="datos-reales-info" id="datosRealesInfo">
-      <div class="info-item">📊 Consumo anual: <strong id="consumoAnual">2.600</strong> kWh</div>
-      <div class="info-item">📈 Promedio mensual: <strong id="promedioMensual">217</strong> kWh</div>
-      <div class="info-item">💰 Tarifa: <strong id="tarifaPais">R$ 0,75</strong> / kWh</div>
-      <div class="info-item">🪙 Moneda: <strong id="monedaPais">R$</strong></div>
-    </div>
-  </section>
-
-  <!-- tarjeta de aparatos -->
-  <section class="card">
-    <div class="card-title">
-      🔌 Aparatos eléctricos
-      <span class="badge-count" id="aparatosCount">0</span>
+      🏠 Zonas y Equipos
+      <span class="badge-count" id="zonasCount">0 zonas</span>
       <div style="margin-left: auto; display: flex; gap: 0.6rem; flex-wrap: wrap;">
-        <button class="btn-success" id="agregarAparatoBtn">➕ Agregar aparato</button>
-        <button class="btn-secondary" id="resetAparatosBtn">↺ Reiniciar lista</button>
+        <button class="btn-success" id="agregarZonaBtn">➕ Agregar zona</button>
       </div>
     </div>
-    <div class="aparatos-container" id="aparatosContainer">
-      <table class="aparatos-table" id="aparatosTable">
-        <thead>
-          <tr>
-            <th style="width: 35%;">Nombre del aparato</th>
-            <th style="width: 25%;">Consumo (kWh/mes)</th>
-            <th style="width: 20%;">Cantidad</th>
-            <th style="width: 15%;">Subtotal</th>
-            <th style="width: 5%;"></th>
-          </tr>
-        </thead>
-        <tbody id="aparatosBody">
-          <!-- Filas generadas por JavaScript -->
-        </tbody>
-      </table>
-    </div>
-    <div class="total-consumo">
-      <span>Total de aparatos: <strong id="totalAparatos">0</strong></span>
-      <span>Consumo total estimado: <strong id="totalConsumo">0</strong> kWh/mes</span>
+    <div id="zonasContainer">
+      <div class="historial-vacio" id="sinZonasMsg">Agrega zonas para análisis más detallado (opcional)</div>
     </div>
   </section>
 
-  <!-- tarjeta de resultados actuales -->
+  <!-- Tarjeta de Resultados -->
   <section class="card" id="resultCard">
-    <div class="card-title">📈 Resultado actual</div>
+    <div class="card-title">
+      📈 Resultado del Análisis
+      <span class="badge-count" id="resultadoFecha">—</span>
+    </div>
     <div id="resultContent">
       <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;">
         <span class="profile-badge" id="perfilBadge">—</span>
-        <span style="color: var(--text-muted); font-size:0.95rem;" id="clasificacionTexto">Clasificación</span>
+        <span style="color: var(--text-muted); font-size:0.95rem;" id="clasificacionTexto">Esperando análisis...</span>
       </div>
+      
       <div class="result-stats">
-        <div class="stat-item"><span class="stat-label">Consumo estimado</span><span class="stat-value" id="consumoEstimado">—</span></div>
-        <div class="stat-item"><span class="stat-label">Costo mensual</span><span class="stat-value" id="costoMensual">—</span></div>
-        <div class="stat-item"><span class="stat-label">Eficiencia</span><span class="stat-value" id="indiceEficiencia">—</span></div>
-        <div class="stat-item"><span class="stat-label">vs. promedio país</span><span class="stat-value" id="vsPromedio">—</span></div>
+        <div class="stat-item">
+          <span class="stat-label">🎯 Categoría</span>
+          <span class="stat-value" id="categoriaOutput">—</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">📊 Probabilidad</span>
+          <span class="stat-value" id="probabilidadOutput">—</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">💰 Costo estimado</span>
+          <span class="stat-value" id="costoEstimado">—</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">📋 Costo referencia</span>
+          <span class="stat-value" id="costoReferencia">—</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">🌍 CO₂ evitable</span>
+          <span class="stat-value" id="co2Evitable">—</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">⚡ Eficiencia</span>
+          <span class="stat-value" id="indiceEficiencia">—</span>
+        </div>
       </div>
+
       <div style="margin-top: 1rem;">
         <strong style="color: var(--text-secondary);">💡 Recomendaciones</strong>
         <ul class="reco-list" id="recoList">
-          <li>Agrega aparatos y haz clic en "Analizar" para ver recomendaciones.</li>
+          <li>Completa los campos obligatorios y haz clic en "Analizar".</li>
         </ul>
       </div>
+
+      <div style="margin-top: 1rem;">
+        <strong style="color: var(--text-secondary);">⚠️ Observaciones</strong>
+        <ul class="observations-list" id="observationsList">
+          <li>Sin observaciones.</li>
+        </ul>
+      </div>
+
       <div style="margin-top: 1.2rem;">
         <details>
-          <summary style="cursor:pointer; font-weight:500; color:var(--accent);">📦 JSON (integración)</summary>
+          <summary style="cursor:pointer; font-weight:500; color:var(--accent);">📦 JSON (integración API)</summary>
           <div class="json-output" id="jsonOutput">{ "mensaje": "Esperando datos..." }</div>
         </details>
       </div>
+
       <div class="flex-actions" style="margin-top: 1.2rem;">
         <button class="btn-primary" id="analizarBtn">🔍 Analizar</button>
-        <button class="btn-secondary" id="resetBtn">↺ Valores iniciales</button>
+        <button class="btn-secondary" id="resetBtn">↺ Restablecer</button>
+        <button class="btn-secondary" id="cargarEjemploBtn">📋 Cargar ejemplo</button>
       </div>
     </div>
   </section>
 
-  <!-- tarjeta de historial -->
+  <!-- Tarjeta de Historial -->
   <section class="card" id="historialCard">
     <div class="card-title">
       📜 Historial de análisis
@@ -720,7 +973,7 @@
 
   <!-- pie de página -->
   <div style="text-align:center; margin-top:1.2rem; color:var(--text-muted); font-size:0.8rem; border-top:1px solid var(--border-color); padding-top:1.2rem;">
-    Tarifa de referencia por país · Consumo calculado por aparatos · Datos: Banco Mundial / IEA
+    🎯 Endpoint POST /analisis-energetico · Datos: GitHub / Banco Mundial / IEA
   </div>
 </div>
 
@@ -730,208 +983,226 @@
     "use strict";
 
     // ============================================================
-    // DATOS REALES DE CONSUMO ENERGÉTICO POR PAÍS
-    // Fuente: Banco Mundial / IEA (datos reales)
+    // CONFIGURACIÓN: URL de datos en GitHub
     // ============================================================
-    const DATOS_REALES = {
-        "Brasil": {
-            "2020": 2470, "2021": 2530, "2022": 2600, "2023": 2650,
-            "tarifa": 0.75, "moneda": "R$", "nombre": "Brasil"
-        },
-        "México": {
-            "2020": 2150, "2021": 2200, "2022": 2280, "2023": 2320,
-            "tarifa": 0.65, "moneda": "MX$", "nombre": "México"
-        },
-        "España": {
-            "2020": 4800, "2021": 4920, "2022": 5100, "2023": 5050,
-            "tarifa": 0.20, "moneda": "€", "nombre": "España"
-        },
-        "Argentina": {
-            "2020": 2300, "2021": 2380, "2022": 2450, "2023": 2500,
-            "tarifa": 0.45, "moneda": "AR$", "nombre": "Argentina"
-        },
-        "Colombia": {
-            "2020": 1700, "2021": 1750, "2022": 1800, "2023": 1850,
-            "tarifa": 0.55, "moneda": "COP", "nombre": "Colombia"
-        },
-        "Chile": {
-            "2020": 3400, "2021": 3500, "2022": 3600, "2023": 3650,
-            "tarifa": 0.50, "moneda": "CLP", "nombre": "Chile"
-        },
-        "Perú": {
-            "2020": 1400, "2021": 1450, "2022": 1500, "2023": 1550,
-            "tarifa": 0.60, "moneda": "PEN", "nombre": "Perú"
-        },
-        "Estados Unidos": {
-            "2020": 12000, "2021": 12200, "2022": 12500, "2023": 12700,
-            "tarifa": 0.14, "moneda": "US$", "nombre": "Estados Unidos"
-        },
-        "Alemania": {
-            "2020": 5600, "2021": 5700, "2022": 5800, "2023": 5750,
-            "tarifa": 0.35, "moneda": "€", "nombre": "Alemania"
-        },
-        "Francia": {
-            "2020": 5400, "2021": 5500, "2022": 5600, "2023": 5550,
-            "tarifa": 0.22, "moneda": "€", "nombre": "Francia"
-        },
-        "Reino Unido": {
-            "2020": 4900, "2021": 5000, "2022": 5100, "2023": 5080,
-            "tarifa": 0.28, "moneda": "£", "nombre": "Reino Unido"
-        }
+    // CAMBIA ESTA URL POR LA TUYA:
+    const DATOS_GITHUB_URL = 'https://raw.githubusercontent.com/tu-usuario/tu-repo/main/datos_energeticos.json';
+    
+    // Datos por defecto (fallback si no se puede cargar desde GitHub)
+    const DATOS_POR_DEFECTO = {
+      "Peru": {
+        "2020": 1400, "2021": 1450, "2022": 1500, "2023": 1550,
+        "tarifa": 0.60, "moneda": "PEN", "nombre": "Perú",
+        "factor_co2": 0.28,
+        "tarifa_pico": 0.95, "tarifa_valle": 0.60,
+        "cargo_fijo_mensual": 4.20,
+        "tasa_impuesto": 0.18
+      },
+      "Brasil": {
+        "2020": 2470, "2021": 2530, "2022": 2600, "2023": 2650,
+        "tarifa": 0.75, "moneda": "R$", "nombre": "Brasil",
+        "factor_co2": 0.32,
+        "tarifa_pico": 0.95, "tarifa_valle": 0.60,
+        "cargo_fijo_mensual": 3.50,
+        "tasa_impuesto": 0.25
+      },
+      "Mexico": {
+        "2020": 2150, "2021": 2200, "2022": 2280, "2023": 2320,
+        "tarifa": 0.65, "moneda": "MX$", "nombre": "México",
+        "factor_co2": 0.30,
+        "tarifa_pico": 0.85, "tarifa_valle": 0.55,
+        "cargo_fijo_mensual": 4.00,
+        "tasa_impuesto": 0.16
+      },
+      "Espana": {
+        "2020": 4800, "2021": 4920, "2022": 5100, "2023": 5050,
+        "tarifa": 0.20, "moneda": "€", "nombre": "España",
+        "factor_co2": 0.18,
+        "tarifa_pico": 0.28, "tarifa_valle": 0.15,
+        "cargo_fijo_mensual": 5.50,
+        "tasa_impuesto": 0.21
+      },
+      "Argentina": {
+        "2020": 2300, "2021": 2380, "2022": 2450, "2023": 2500,
+        "tarifa": 0.45, "moneda": "AR$", "nombre": "Argentina",
+        "factor_co2": 0.35,
+        "tarifa_pico": 0.60, "tarifa_valle": 0.40,
+        "cargo_fijo_mensual": 3.80,
+        "tasa_impuesto": 0.21
+      },
+      "Colombia": {
+        "2020": 1700, "2021": 1750, "2022": 1800, "2023": 1850,
+        "tarifa": 0.55, "moneda": "COP", "nombre": "Colombia",
+        "factor_co2": 0.25,
+        "tarifa_pico": 0.70, "tarifa_valle": 0.50,
+        "cargo_fijo_mensual": 3.20,
+        "tasa_impuesto": 0.19
+      },
+      "Chile": {
+        "2020": 3400, "2021": 3500, "2022": 3600, "2023": 3650,
+        "tarifa": 0.50, "moneda": "CLP", "nombre": "Chile",
+        "factor_co2": 0.28,
+        "tarifa_pico": 0.65, "tarifa_valle": 0.45,
+        "cargo_fijo_mensual": 4.50,
+        "tasa_impuesto": 0.19
+      },
+      "Estados Unidos": {
+        "2020": 12000, "2021": 12200, "2022": 12500, "2023": 12700,
+        "tarifa": 0.14, "moneda": "US$", "nombre": "Estados Unidos",
+        "factor_co2": 0.38,
+        "tarifa_pico": 0.20, "tarifa_valle": 0.10,
+        "cargo_fijo_mensual": 6.00,
+        "tasa_impuesto": 0.08
+      },
+      "Alemania": {
+        "2020": 5600, "2021": 5700, "2022": 5800, "2023": 5750,
+        "tarifa": 0.35, "moneda": "€", "nombre": "Alemania",
+        "factor_co2": 0.22,
+        "tarifa_pico": 0.45, "tarifa_valle": 0.30,
+        "cargo_fijo_mensual": 8.00,
+        "tasa_impuesto": 0.19
+      },
+      "Francia": {
+        "2020": 5400, "2021": 5500, "2022": 5600, "2023": 5550,
+        "tarifa": 0.22, "moneda": "€", "nombre": "Francia",
+        "factor_co2": 0.15,
+        "tarifa_pico": 0.30, "tarifa_valle": 0.18,
+        "cargo_fijo_mensual": 5.80,
+        "tasa_impuesto": 0.20
+      },
+      "Reino Unido": {
+        "2020": 4900, "2021": 5000, "2022": 5100, "2023": 5080,
+        "tarifa": 0.28, "moneda": "£", "nombre": "Reino Unido",
+        "factor_co2": 0.20,
+        "tarifa_pico": 0.38, "tarifa_valle": 0.22,
+        "cargo_fijo_mensual": 7.50,
+        "tasa_impuesto": 0.20
+      }
     };
 
-    // ----- DOM refs -----
-    const horasPicoInput = document.getElementById('horasPico');
-    const perfilUsoSelect = document.getElementById('perfilUso');
+    // Estado de datos (se cargará desde GitHub o fallback)
+    let DATOS_PAISES = {};
+
+    // ============================================================
+    // DOM REFS
+    // ============================================================
+    const tipoInmueble = document.getElementById('tipoInmueble');
+    const consumoKwh = document.getElementById('consumoKwh');
+    const usoHorarioPico = document.getElementById('usoHorarioPico');
+    const horasAltoConsumo = document.getElementById('horasAltoConsumo');
+    const mes = document.getElementById('mes');
+    const regionPais = document.getElementById('regionPais');
+    const superficieM2 = document.getElementById('superficieM2');
+    const habitantes = document.getElementById('habitantes');
+    const casaInteligente = document.getElementById('casaInteligente');
+    const sensoresIot = document.getElementById('sensoresIot');
+    const mantenimientoGeneral = document.getElementById('mantenimientoGeneral');
+    const panelesSolares = document.getElementById('panelesSolares');
+    const cargadorVe = document.getElementById('cargadorVe');
+    const factorPotencia = document.getElementById('factorPotencia');
+    const capacidadSolar = document.getElementById('capacidadSolar');
+    const tieneBaterias = document.getElementById('tieneBaterias');
+    const tipoConexion = document.getElementById('tipoConexion');
+    const distribuidora = document.getElementById('distribuidora');
+    const usaTarifaPersonalizada = document.getElementById('usaTarifaPersonalizada');
+    const tarifaPersonalizada = document.getElementById('tarifaPersonalizada');
     const paisSelect = document.getElementById('paisSelect');
     const anioSelect = document.getElementById('anioSelect');
+    const advancedToggle = document.getElementById('advancedToggle');
+
     const analizarBtn = document.getElementById('analizarBtn');
     const resetBtn = document.getElementById('resetBtn');
+    const cargarEjemploBtn = document.getElementById('cargarEjemploBtn');
     const actualizarDatosBtn = document.getElementById('actualizarDatosBtn');
 
     const perfilBadge = document.getElementById('perfilBadge');
     const clasificacionTexto = document.getElementById('clasificacionTexto');
-    const consumoEstimado = document.getElementById('consumoEstimado');
-    const costoMensual = document.getElementById('costoMensual');
+    const categoriaOutput = document.getElementById('categoriaOutput');
+    const probabilidadOutput = document.getElementById('probabilidadOutput');
+    const costoEstimado = document.getElementById('costoEstimado');
+    const costoReferencia = document.getElementById('costoReferencia');
+    const co2Evitable = document.getElementById('co2Evitable');
     const indiceEficiencia = document.getElementById('indiceEficiencia');
-    const vsPromedio = document.getElementById('vsPromedio');
     const recoList = document.getElementById('recoList');
+    const observationsList = document.getElementById('observationsList');
     const jsonOutput = document.getElementById('jsonOutput');
+    const resultadoFecha = document.getElementById('resultadoFecha');
 
     const historialContainer = document.getElementById('historialContainer');
     const historialCount = document.getElementById('historialCount');
     const borrarTodoBtn = document.getElementById('borrarTodoBtn');
 
-    const aparatosBody = document.getElementById('aparatosBody');
-    const totalAparatos = document.getElementById('totalAparatos');
-    const totalConsumo = document.getElementById('totalConsumo');
-    const aparatosCount = document.getElementById('aparatosCount');
-    const agregarAparatoBtn = document.getElementById('agregarAparatoBtn');
-    const resetAparatosBtn = document.getElementById('resetAparatosBtn');
+    const zonasContainer = document.getElementById('zonasContainer');
+    const sinZonasMsg = document.getElementById('sinZonasMsg');
+    const zonasCount = document.getElementById('zonasCount');
+    const agregarZonaBtn = document.getElementById('agregarZonaBtn');
 
-    // Datos reales info
-    const paisActual = document.getElementById('paisActual');
     const consumoAnual = document.getElementById('consumoAnual');
     const promedioMensual = document.getElementById('promedioMensual');
     const tarifaPais = document.getElementById('tarifaPais');
     const monedaPais = document.getElementById('monedaPais');
+    const factorCO2 = document.getElementById('factorCO2');
 
-    // Theme
     const themeToggle = document.getElementById('themeToggle');
     const themeIcon = document.getElementById('themeIcon');
     const themeLabel = document.getElementById('themeLabel');
 
-    // ----- estado -----
-    const DEFAULT = {
-      horasPico: 5,
-      perfil: 'comercio',
-      pais: 'Brasil',
-      anio: '2022'
-    };
-
-    // Aparatos por defecto (ejemplos reales)
-    const APARATOS_POR_DEFECTO = [
-      { nombre: 'Refrigerador', consumo: 60, cantidad: 1 },
-      { nombre: 'Lavadora', consumo: 30, cantidad: 1 },
-      { nombre: 'Microondas', consumo: 20, cantidad: 1 },
-      { nombre: 'Televisor', consumo: 25, cantidad: 1 },
-      { nombre: 'Computadora', consumo: 30, cantidad: 1 },
-      { nombre: 'Router', consumo: 10, cantidad: 1 },
-      { nombre: 'Aire acondicionado', consumo: 150, cantidad: 1 },
-      { nombre: 'Bombillas LED', consumo: 15, cantidad: 5 }
-    ];
-
-    let aparatos = [];
-
-    // Historial almacenado en localStorage
+    // ============================================================
+    // ESTADO
+    // ============================================================
+    let zonas = [];
     let historial = [];
-    const STORAGE_KEY = 'energia_historial_aparatos_v2';
-    const APARATOS_KEY = 'energia_aparatos_v2';
-    const PAIS_KEY = 'energia_pais_seleccionado';
+    const STORAGE_KEY = 'energia_historial_v3';
+    const ZONAS_KEY = 'energia_zonas_v3';
+    const PAIS_KEY = 'energia_pais_v3';
 
-    function cargarHistorial() {
+    // ============================================================
+    // FUNCIONES DE CARGA DE DATOS DESDE GITHUB
+    // ============================================================
+    async function cargarDatosDesdeGitHub() {
       try {
-        const data = localStorage.getItem(STORAGE_KEY);
-        historial = data ? JSON.parse(data) : [];
-      } catch { historial = []; }
-    }
-
-    function guardarHistorial() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(historial));
-    }
-
-    function cargarAparatos() {
-      try {
-        const data = localStorage.getItem(APARATOS_KEY);
-        if (data) {
-          aparatos = JSON.parse(data);
-        } else {
-          aparatos = JSON.parse(JSON.stringify(APARATOS_POR_DEFECTO));
+        const response = await fetch(DATOS_GITHUB_URL);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        // Validar que tenga la estructura esperada
+        if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+          DATOS_PAISES = data;
+          mostrarToast('✅ Datos cargados', 'Datos actualizados desde GitHub');
+          return true;
         }
-      } catch {
-        aparatos = JSON.parse(JSON.stringify(APARATOS_POR_DEFECTO));
+        throw new Error('Estructura de datos inválida');
+      } catch (error) {
+        console.warn('Error cargando datos desde GitHub:', error);
+        // Usar datos por defecto
+        DATOS_PAISES = JSON.parse(JSON.stringify(DATOS_POR_DEFECTO));
+        mostrarToast('⚠️ Datos locales', 'Usando datos por defecto (fallback)');
+        return false;
       }
     }
 
-    function guardarAparatos() {
-      localStorage.setItem(APARATOS_KEY, JSON.stringify(aparatos));
-    }
-
-    function cargarPaisSeleccionado() {
-      try {
-        const data = localStorage.getItem(PAIS_KEY);
-        if (data) {
-          const parsed = JSON.parse(data);
-          paisSelect.value = parsed.pais || DEFAULT.pais;
-          anioSelect.value = parsed.anio || DEFAULT.anio;
-        }
-      } catch {}
-    }
-
-    function guardarPaisSeleccionado() {
-      localStorage.setItem(PAIS_KEY, JSON.stringify({
-        pais: paisSelect.value,
-        anio: anioSelect.value
-      }));
-    }
-
-    // ----- funciones de datos reales -----
+    // ============================================================
+    // FUNCIONES DE DATOS
+    // ============================================================
     function obtenerDatosPais(pais, anio) {
-      const datos = DATOS_REALES[pais];
+      const datos = DATOS_PAISES[pais];
       if (!datos) return null;
       return {
         consumo_anual: datos[anio] || datos["2022"],
         tarifa: datos.tarifa,
         moneda: datos.moneda,
         nombre: datos.nombre,
+        factor_co2: datos.factor_co2 || 0.28,
+        tarifa_pico: datos.tarifa_pico || datos.tarifa * 1.3,
+        tarifa_valle: datos.tarifa_valle || datos.tarifa * 0.8,
+        cargo_fijo_mensual: datos.cargo_fijo_mensual || 3.50,
+        tasa_impuesto: datos.tasa_impuesto || 0.18,
         promedio_mensual: Math.round((datos[anio] || datos["2022"]) / 12)
       };
     }
 
-    function actualizarInfoPais() {
-      const pais = paisSelect.value;
-      const anio = anioSelect.value;
-      const datos = obtenerDatosPais(pais, anio);
-      
-      if (!datos) {
-        mostrarToast('Error', 'No hay datos disponibles para este país/año', 'error');
-        return;
-      }
-
-      paisActual.textContent = `${pais} ${anio}`;
-      consumoAnual.textContent = datos.consumo_anual.toLocaleString();
-      promedioMensual.textContent = datos.promedio_mensual;
-      tarifaPais.textContent = `${datos.moneda} ${datos.tarifa.toFixed(2)}`;
-      monedaPais.textContent = datos.moneda;
-
-      guardarPaisSeleccionado();
-      mostrarToast('✅ Datos actualizados', `Datos de ${pais} (${anio}) cargados correctamente`);
-      
-      // Actualizar vista previa con nuevos datos
-      actualizarVistaPrevia();
-    }
-
-    // ----- Toast notification -----
+    // ============================================================
+    // TOAST
+    // ============================================================
     function mostrarToast(titulo, mensaje, tipo = 'success') {
       const existing = document.querySelector('.toast');
       if (existing) existing.remove();
@@ -951,246 +1222,386 @@
       }, 4000);
     }
 
-    // ----- funciones de análisis -----
-    function analizarConsumo(consumoTotal, horasPico, equipos, perfil, pais, anio) {
-      const datos = obtenerDatosPais(pais, anio);
-      const promedioPais = datos ? datos.promedio_mensual : 220;
-      const tarifa = datos ? datos.tarifa : 0.75;
-      const moneda = datos ? datos.moneda : 'R$';
-
-      let puntaje = 0;
-      let consumoEsperado = 0;
+    // ============================================================
+    // MODELO DE CLASIFICACIÓN (simula ML)
+    // ============================================================
+    function clasificarPerfil(consumo, tipoInmueble, horasPico, usoPico, superficie, habitantes, 
+                              esInteligente, tieneIot, mantenimiento, panelesSolares, cargador,
+                              factorPotencia, tipoConexion, datosPais) {
       
-      // Ajustar consumo esperado según perfil
-      if (perfil === 'hogar') consumoEsperado = promedioPais * 0.9;
-      else if (perfil === 'oficina') consumoEsperado = promedioPais * 1.2;
-      else if (perfil === 'comercio') consumoEsperado = promedioPais * 1.5;
-      else consumoEsperado = promedioPais * 1.1;
+      const promedioPais = datosPais ? datosPais.promedio_mensual : 220;
+      
+      // Factores de ajuste
+      let factorTipo = 1.0;
+      if (tipoInmueble === 'Casa') factorTipo = 0.9;
+      else if (tipoInmueble === 'Departamento') factorTipo = 0.8;
+      else if (tipoInmueble === 'Oficina') factorTipo = 1.2;
+      else if (tipoInmueble === 'Comercio') factorTipo = 1.5;
+      else if (tipoInmueble === 'Industrial') factorTipo = 2.0;
 
-      // Ajustar por horas pico
-      const horasFactor = Math.min(horasPico / 4, 3);
-      const equiposFactor = Math.min(equipos / 6, 2.5);
+      let factorSuperficie = 1.0;
+      if (superficie > 0) {
+        const consumoEspecifico = consumo / superficie;
+        if (consumoEspecifico < 1.5) factorSuperficie = 0.7;
+        else if (consumoEspecifico < 3) factorSuperficie = 0.9;
+        else if (consumoEspecifico < 5) factorSuperficie = 1.2;
+        else factorSuperficie = 1.6;
+      }
 
-      puntaje = (consumoTotal / consumoEsperado) * 0.5 + (horasFactor * 0.25) + (equiposFactor * 0.25);
-      if (perfil === 'comercio' || perfil === 'oficina') puntaje = puntaje * 0.9;
+      let factorHabitantes = 1.0;
+      if (habitantes > 0) {
+        if (habitantes <= 2) factorHabitantes = 0.8;
+        else if (habitantes <= 4) factorHabitantes = 1.0;
+        else factorHabitantes = 1.3;
+      }
 
-      let clasificacion = '';
-      if (puntaje < 0.65) clasificacion = 'Eficiente';
-      else if (puntaje < 1.1) clasificacion = 'Moderado';
-      else clasificacion = 'Ineficiente';
+      let factorPico = usoPico ? 1.2 : 1.0;
+      let factorHoras = Math.min(horasPico / 4, 2.5);
 
-      const costo = consumoTotal * tarifa;
-      let eficiencia = Math.max(0, Math.min(100, 100 - ((puntaje - 0.4) * 50)));
-      if (clasificacion === 'Eficiente') eficiencia = Math.min(100, eficiencia + 15);
-      else if (clasificacion === 'Ineficiente') eficiencia = Math.max(10, eficiencia - 10);
+      let factorTecnologia = 1.0;
+      if (esInteligente) factorTecnologia *= 0.85;
+      if (tieneIot) factorTecnologia *= 0.90;
+      if (mantenimiento) factorTecnologia *= 0.90;
+      if (panelesSolares) factorTecnologia *= 0.70;
+      if (cargador) factorTecnologia *= 1.15;
 
-      // Comparación con promedio del país
-      const vsPromedioValor = Math.round((consumoTotal / promedioPais) * 100);
+      let factorCalidad = 1.0;
+      if (factorPotencia && factorPotencia < 0.85) factorCalidad = 1.15;
+      else if (factorPotencia && factorPotencia > 0.95) factorCalidad = 0.90;
 
-      let recomendaciones = [];
-      if (clasificacion === 'Ineficiente') {
-        recomendaciones.push(`🔴 Tu consumo es un ${vsPromedioValor}% del promedio de ${pais}.`);
-        recomendaciones.push('🔌 Desconecta equipos en stand-by, reducen hasta un 12% del consumo.');
-        recomendaciones.push('💡 Sustituye bombillas tradicionales por LED de bajo consumo.');
-        if (horasPico > 4) recomendaciones.push('⏰ Traslada actividades de alto consumo a horas de menor demanda.');
-        if (equipos > 6) recomendaciones.push('📉 Revisa la antigüedad de tus equipos; los modernos son más eficientes.');
-        recomendaciones.push('🌡️ Ajusta la climatización: cada grado extra supone un 7% más de gasto.');
-      } else if (clasificacion === 'Moderado') {
-        recomendaciones.push(`📊 Tu consumo es ${vsPromedioValor}% del promedio de ${pais}.`);
-        recomendaciones.push('💡 Programa apagado automático de equipos no esenciales.');
-        if (horasPico > 3) recomendaciones.push('⏳ Intenta reducir las horas de uso intensivo en un 10%.');
-        recomendaciones.push('🔋 Considera un sistema de energía solar para reducir costos a largo plazo.');
+      let factorConexion = tipoConexion === 'Trifásico' ? 1.1 : 1.0;
+
+      // Consumo esperado ajustado
+      let consumoEsperado = promedioPais * factorTipo * factorSuperficie * factorHabitantes * 
+                           factorPico * factorHoras * factorTecnologia * factorCalidad * factorConexion;
+      
+      // Relación consumo real vs esperado
+      let ratio = consumo / consumoEsperado;
+
+      // Clasificación con umbrales ajustados
+      let categoria = '';
+      let probabilidad = 0;
+      
+      if (ratio < 0.6) {
+        categoria = 'Eficiente';
+        probabilidad = Math.min(0.95, 0.7 + (0.6 - ratio) * 0.5);
+      } else if (ratio < 0.9) {
+        categoria = 'Eficiente';
+        probabilidad = 0.65 + (0.9 - ratio) * 0.3;
+      } else if (ratio < 1.2) {
+        categoria = 'Moderado';
+        probabilidad = 0.6 + (1.2 - ratio) * 0.15;
+      } else if (ratio < 1.6) {
+        categoria = 'Moderado';
+        probabilidad = 0.55 + (1.6 - ratio) * 0.1;
+      } else if (ratio < 2.0) {
+        categoria = 'Ineficiente';
+        probabilidad = 0.6 + (ratio - 1.6) * 0.1;
       } else {
-        recomendaciones.push(`🌟 ¡Excelente! Tu consumo es ${vsPromedioValor}% del promedio de ${pais}.`);
-        recomendaciones.push('📱 Comparte tus hábitos sostenibles con tu comunidad.');
-        recomendaciones.push('⚡ Si aún no lo haces, explora tarifas con discriminación horaria para optimizar.');
+        categoria = 'Ineficiente';
+        probabilidad = Math.min(0.95, 0.7 + (ratio - 2.0) * 0.08);
       }
 
-      // Recomendaciones específicas por país
-      if (pais === 'Brasil') {
-        recomendaciones.push('🇧🇷 En Brasil, el aire acondicionado representa hasta el 40% del consumo en verano.');
-      } else if (pais === 'España') {
-        recomendaciones.push('🇪🇸 En España, la calefacción supone el 30% del gasto energético en invierno.');
-      } else if (pais === 'México') {
-        recomendaciones.push('🇲🇽 En México, los refrigeradores son los electrodomésticos que más energía consumen.');
-      } else if (pais === 'Estados Unidos') {
-        recomendaciones.push('🇺🇸 En EE.UU., la climatización representa más del 40% del consumo residencial.');
-      }
+      // Ajustes de probabilidad
+      probabilidad = Math.max(0.5, Math.min(0.98, probabilidad));
 
-      recomendaciones = [...new Set(recomendaciones)];
+      // Eficiencia porcentual
+      let eficiencia = Math.max(10, Math.min(100, 100 - (ratio - 0.5) * 25));
+      if (categoria === 'Eficiente') eficiencia = Math.min(100, eficiencia + 10);
+      else if (categoria === 'Ineficiente') eficiencia = Math.max(10, eficiencia - 10);
 
       return {
-        clasificacion,
-        consumo: consumoTotal,
-        costo,
+        categoria,
+        probabilidad: Math.round(probabilidad * 100) / 100,
         eficiencia: Math.round(eficiencia),
-        recomendaciones,
-        perfil,
-        horasPico,
-        equipos,
-        pais,
-        anio,
-        moneda,
-        promedioPais,
-        vsPromedio: vsPromedioValor,
+        ratio: Math.round(ratio * 100) / 100,
         consumoEsperado: Math.round(consumoEsperado)
       };
     }
 
-    // ----- calcular totales -----
-    function calcularTotales() {
-      let total = 0;
-      let cantidad = 0;
-      aparatos.forEach(a => {
-        const consumo = parseFloat(a.consumo) || 0;
-        const cant = parseInt(a.cantidad) || 0;
-        total += consumo * cant;
-        cantidad += cant;
-      });
-      return { total, cantidad };
-    }
-
-    // ----- renderizar tabla de aparatos -----
-    function renderizarAparatos() {
-      aparatosBody.innerHTML = '';
-      let total = 0;
-      let cantidad = 0;
-
-      aparatos.forEach((aparato, index) => {
-        const consumo = parseFloat(aparato.consumo) || 0;
-        const cant = parseInt(aparato.cantidad) || 0;
-        const subtotal = consumo * cant;
-        total += subtotal;
-        cantidad += cant;
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>
-            <input type="text" class="input-nombre" value="${aparato.nombre}" 
-                   data-index="${index}" data-field="nombre" 
-                   placeholder="Nombre del aparato">
-          </td>
-          <td>
-            <input type="number" class="input-consumo" value="${consumo}" 
-                   data-index="${index}" data-field="consumo" 
-                   step="0.1" min="0" placeholder="0">
-          </td>
-          <td>
-            <input type="number" class="input-cantidad" value="${cant}" 
-                   data-index="${index}" data-field="cantidad" 
-                   step="1" min="0" placeholder="1">
-          </td>
-          <td><strong>${subtotal.toFixed(1)}</strong> kWh</td>
-          <td>
-            <button class="btn-danger-small eliminar-aparato" data-index="${index}">✕</button>
-          </td>
-        `;
-        aparatosBody.appendChild(tr);
-      });
-
-      // Actualizar totales
-      totalAparatos.textContent = cantidad;
-      totalConsumo.textContent = total.toFixed(1);
-      aparatosCount.textContent = aparatos.length;
-
-      // Eventos para inputs
-      document.querySelectorAll('.input-nombre, .input-consumo, .input-cantidad').forEach(input => {
-        input.addEventListener('change', function() {
-          const index = parseInt(this.dataset.index);
-          const field = this.dataset.field;
-          let value = this.value;
-          if (field === 'consumo' || field === 'cantidad') {
-            value = parseFloat(value) || 0;
-          }
-          aparatos[index][field] = value;
-          guardarAparatos();
-          renderizarAparatos();
-          actualizarVistaPrevia();
-        });
-      });
-
-      // Eventos para eliminar
-      document.querySelectorAll('.eliminar-aparato').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const index = parseInt(this.dataset.index);
-          aparatos.splice(index, 1);
-          guardarAparatos();
-          renderizarAparatos();
-          actualizarVistaPrevia();
-        });
-      });
-    }
-
-    // ----- agregar aparato -----
-    function agregarAparato() {
-      aparatos.push({ nombre: 'Nuevo aparato', consumo: 0, cantidad: 1 });
-      guardarAparatos();
-      renderizarAparatos();
-      const inputs = document.querySelectorAll('.input-nombre');
-      if (inputs.length > 0) {
-        inputs[inputs.length - 1].focus();
-        inputs[inputs.length - 1].select();
+    // ============================================================
+    // CÁLCULO DE COSTOS
+    // ============================================================
+    function calcularCostos(consumo, datosPais, usaPersonalizada, tarifaPersonalizadaValor) {
+      if (!datosPais) {
+        return { estimado: consumo * 0.75, referencia: consumo * 0.75, tarifaUsada: 0.75 };
       }
-    }
 
-    // ----- resetear aparatos -----
-    function resetearAparatos() {
-      if (confirm('¿Restablecer la lista de aparatos a los valores predeterminados?')) {
-        aparatos = JSON.parse(JSON.stringify(APARATOS_POR_DEFECTO));
-        guardarAparatos();
-        renderizarAparatos();
-        actualizarVistaPrevia();
-        mostrarToast('↺ Lista restablecida', 'Se cargaron los aparatos por defecto');
+      let tarifaEstimada = datosPais.tarifa;
+      let tarifaRef = 0.75; // Tarifa estándar del brief
+
+      // Si usa tarifa personalizada, reemplazar
+      if (usaPersonalizada && tarifaPersonalizadaValor > 0) {
+        tarifaEstimada = tarifaPersonalizadaValor;
       }
+
+      const estimado = consumo * tarifaEstimada;
+      const referencia = consumo * tarifaRef;
+
+      return {
+        estimado: Math.round(estimado * 100) / 100,
+        referencia: Math.round(referencia * 100) / 100,
+        tarifaUsada: tarifaEstimada,
+        moneda: datosPais.moneda
+      };
     }
 
-    // ----- actualizar vista previa -----
-    function actualizarVistaPrevia() {
-      const { total, cantidad } = calcularTotales();
-      const horasPico = parseFloat(horasPicoInput.value) || 0;
-      const perfil = perfilUsoSelect.value;
+    // ============================================================
+    // CÁLCULO DE CO2
+    // ============================================================
+    function calcularCO2(consumo, datosPais) {
+      const factor = datosPais ? datosPais.factor_co2 : 0.28;
+      // CO2 evitable = 30% del consumo * factor (estimación conservadora)
+      const evitable = consumo * 0.3 * factor;
+      return Math.round(evitable * 100) / 100;
+    }
+
+    // ============================================================
+    // GENERAR RECOMENDACIONES
+    // ============================================================
+    function generarRecomendaciones(consumo, tipoInmueble, horasPico, usoPico, superficie, habitantes,
+                                   esInteligente, tieneIot, mantenimiento, panelesSolares, cargador,
+                                   factorPotencia, datosPais, categoria) {
+      const reco = [];
+      const pais = datosPais ? datosPais.nombre : 'tu país';
+
+      // Recomendaciones basadas en categoría
+      if (categoria === 'Ineficiente') {
+        reco.push(`🔴 Tu consumo es alto. Considera revisar equipos antiguos o ineficientes.`);
+        reco.push('💡 Sustituye bombillas tradicionales por LED de bajo consumo (ahorro ~60%).');
+        reco.push('🔌 Desconecta equipos en stand-by, reducen hasta un 12% del consumo.');
+        if (horasPico > 4) {
+          reco.push('⏰ Traslada actividades de alto consumo a horas de menor demanda (fuera de punta).');
+        }
+        if (!mantenimiento) {
+          reco.push('🔧 Realiza mantenimiento de equipos: los equipos sin mantenimiento consumen hasta un 25% más.');
+        }
+        if (habitantes > 4) {
+          reco.push('👨‍👩‍👧‍👦 Concientiza a los ocupantes sobre hábitos de ahorro energético.');
+        }
+        if (factorPotencia && factorPotencia < 0.85) {
+          reco.push('⚡ Revisa el factor de potencia: valores bajos indican desperdicio por energía reactiva.');
+        }
+        if (panelesSolares) {
+          reco.push('☀️ Optimiza el uso de tus paneles solares: considera baterías para almacenamiento.');
+        }
+      } else if (categoria === 'Moderado') {
+        reco.push(`📊 Tu consumo es moderado. Con pequeños ajustes puedes ser más eficiente.`);
+        if (horasPico > 3) {
+          reco.push('⏳ Reduce las horas de uso intensivo en un 10% para optimizar.');
+        }
+        if (esInteligente) {
+          reco.push('🏠 Programa tus dispositivos inteligentes para optimizar el consumo.');
+        }
+        if (!panelesSolares) {
+          reco.push('☀️ Considera paneles solares para reducir costos a largo plazo.');
+        }
+        reco.push('📱 Monitorea tu consumo con apps para identificar picos innecesarios.');
+      } else {
+        reco.push(`🌟 ¡Excelente! Tu consumo es eficiente. Sigue así.`);
+        if (panelesSolares) {
+          reco.push('☀️ Aprovecha al máximo tu energía solar: considera vender excedentes a la red.');
+        }
+        reco.push('📱 Comparte tus hábitos sostenibles con tu comunidad.');
+        if (!cargador) {
+          reco.push('🔌 Si tienes vehículo eléctrico, asegura cargadores eficientes.');
+        }
+      }
+
+      // Recomendaciones específicas por país
+      if (datosPais) {
+        if (datosPais.nombre === 'Perú') {
+          reco.push('🇵🇪 En Perú, la climatización es clave: usa ventiladores en lugar de aire acondicionado cuando sea posible.');
+        } else if (datosPais.nombre === 'Brasil') {
+          reco.push('🇧🇷 En Brasil, el aire acondicionado representa hasta el 40% del consumo en verano. Usa termostato a 24°C.');
+        } else if (datosPais.nombre === 'España') {
+          reco.push('🇪🇸 En España, la calefacción supone el 30% del gasto en invierno. Aísla bien tu vivienda.');
+        } else if (datosPais.nombre === 'México') {
+          reco.push('🇲🇽 En México, los refrigeradores son los que más energía consumen. Verifica su eficiencia.');
+        }
+      }
+
+      // Recomendación universal
+      reco.push('📊 Realiza un seguimiento mensual de tu consumo para identificar tendencias.');
+
+      // Eliminar duplicados
+      return [...new Set(reco)];
+    }
+
+    // ============================================================
+    // GENERAR OBSERVACIONES (cargos regulados, impuestos)
+    // ============================================================
+    function generarObservaciones(consumo, datosPais) {
+      const obs = [];
+      if (!datosPais) return obs;
+
+      // Cargo fijo mensual
+      const cargoFijo = datosPais.cargo_fijo_mensual || 3.50;
+      if (cargoFijo > 8) {
+        obs.push(`⚠️ Cargo fijo mensual (${datosPais.moneda} ${cargoFijo.toFixed(2)}) está por encima del rango típico.`);
+      }
+
+      // Tasa de impuesto
+      const tasaImp = datosPais.tasa_impuesto || 0.18;
+      if (tasaImp > 0.25) {
+        obs.push(`⚠️ Tasa de impuesto (${(tasaImp * 100).toFixed(0)}%) está por encima de la tasa oficial del país.`);
+      }
+
+      // Consumo vs promedio
+      const promedio = datosPais.promedio_mensual;
+      const ratio = consumo / promedio;
+      if (ratio > 2.5) {
+        obs.push(`⚠️ Consumo muy alto (${(ratio * 100).toFixed(0)}% del promedio). Revisar equipos críticos.`);
+      } else if (ratio > 1.8) {
+        obs.push(`⚠️ Consumo elevado (${(ratio * 100).toFixed(0)}% del promedio). Considerar auditoría energética.`);
+      }
+
+      if (obs.length === 0) {
+        obs.push('✅ Todo en orden. Sin observaciones relevantes.');
+      }
+
+      return obs;
+    }
+
+    // ============================================================
+    // ANÁLISIS PRINCIPAL
+    // ============================================================
+    function ejecutarAnalisis() {
+      // Leer valores
+      const tipo = tipoInmueble.value;
+      const consumo = parseFloat(consumoKwh.value) || 0;
+      const usoPico = usoHorarioPico.value === 'true';
+      const horasPico = parseFloat(horasAltoConsumo.value) || 0;
+      const mesVal = mes.value;
+      const region = regionPais.value || 'No especificada';
+      const superficie = parseFloat(superficieM2.value) || 0;
+      const habitantesVal = parseInt(habitantes.value) || 0;
+      const esInteligente = casaInteligente.value === 'true';
+      const tieneIot = sensoresIot.value === 'true';
+      const mantenimiento = mantenimientoGeneral.value === 'true';
+      const paneles = panelesSolares.value === 'true';
+      const cargador = cargadorVe.value === 'true';
+      const factorPot = parseFloat(factorPotencia.value) || 0;
+      const capSolar = parseFloat(capacidadSolar.value) || 0;
+      const baterias = tieneBaterias.value === 'true';
+      const conexion = tipoConexion.value;
+      const distribuidoraVal = distribuidora.value || 'No especificada';
+      const usaPersonalizada = usaTarifaPersonalizada.value === 'true';
+      const tarifaPers = parseFloat(tarifaPersonalizada.value) || 0;
       const pais = paisSelect.value;
       const anio = anioSelect.value;
 
-      if (total > 0 && cantidad > 0) {
-        const resultado = analizarConsumo(total, horasPico, cantidad, perfil, pais, anio);
-        renderizar(resultado);
-      } else {
-        perfilBadge.textContent = '—';
-        perfilBadge.className = 'profile-badge';
-        clasificacionTexto.textContent = 'Agrega aparatos para analizar';
-        consumoEstimado.innerHTML = '—';
-        costoMensual.innerHTML = '—';
-        indiceEficiencia.innerHTML = '—';
-        vsPromedio.innerHTML = '—';
-        recoList.innerHTML = '<li>Agrega al menos un aparato con consumo > 0.</li>';
-        jsonOutput.textContent = JSON.stringify({ mensaje: 'Esperando datos...' }, null, 2);
+      // Validaciones
+      if (consumo <= 0) {
+        alert('⚠️ El consumo debe ser mayor a 0 kWh.');
+        return;
       }
+
+      // Obtener datos del país
+      const datosPais = obtenerDatosPais(pais, anio);
+      if (!datosPais) {
+        alert('⚠️ No hay datos disponibles para este país/año.');
+        return;
+      }
+
+      // Clasificación
+      const clasificacion = clasificarPerfil(
+        consumo, tipo, horasPico, usoPico, superficie, habitantesVal,
+        esInteligente, tieneIot, mantenimiento, paneles, cargador,
+        factorPot, conexion, datosPais
+      );
+
+      // Costos
+      const costos = calcularCostos(consumo, datosPais, usaPersonalizada, tarifaPers);
+
+      // CO2
+      const co2 = calcularCO2(consumo, datosPais);
+
+      // Recomendaciones
+      const recomendaciones = generarRecomendaciones(
+        consumo, tipo, horasPico, usoPico, superficie, habitantesVal,
+        esInteligente, tieneIot, mantenimiento, paneles, cargador,
+        factorPot, datosPais, clasificacion.categoria
+      );
+
+      // Observaciones
+      const observaciones = generarObservaciones(consumo, datosPais);
+
+      // Construir resultado
+      const resultado = {
+        categoria: clasificacion.categoria,
+        probabilidad: clasificacion.probabilidad,
+        costo_estimado_mensual: costos.estimado,
+        costo_referencia_brief: costos.referencia,
+        co2_evitable_kg_mes: co2,
+        recomendaciones: recomendaciones,
+        observaciones: observaciones,
+        metadatos: {
+          tipo_inmueble: tipo,
+          consumo_kwh: consumo,
+          uso_horario_pico: usoPico,
+          horas_alto_consumo: horasPico,
+          mes: mesVal,
+          region: region,
+          superficie_m2: superficie,
+          habitantes: habitantesVal,
+          pais: pais,
+          anio: anio,
+          moneda: datosPais.moneda,
+          eficiencia: clasificacion.eficiencia,
+          ratio_vs_esperado: clasificacion.ratio,
+          factor_potencia: factorPot,
+          tipo_conexion: conexion,
+          tiene_paneles: paneles,
+          capacidad_solar: capSolar,
+          tiene_baterias: baterias,
+          tiene_cargador_ve: cargador
+        }
+      };
+
+      // Renderizar
+      renderizarResultado(resultado, datosPais);
+      
+      // Guardar en historial
+      guardarEnHistorial(resultado, datosPais, consumo, tipo, horasPico, usoPico, mesVal, region);
+      
+      mostrarToast('✅ Análisis completado', `Categoría: ${resultado.categoria}`);
     }
 
-    // ----- renderizar resultado -----
-    function renderizar(resultado) {
-      const { clasificacion, consumo, costo, eficiencia, recomendaciones, perfil, horasPico, equipos, pais, anio, moneda, vsPromedio: vs, promedioPais } = resultado;
+    // ============================================================
+    // RENDERIZAR RESULTADO
+    // ============================================================
+    function renderizarResultado(resultado, datosPais) {
+      const { categoria, probabilidad, costo_estimado_mensual, costo_referencia_brief,
+              co2_evitable_kg_mes, recomendaciones, observaciones, metadatos } = resultado;
 
-      perfilBadge.textContent = clasificacion;
+      const moneda = metadatos.moneda || 'US$';
+      const ahora = new Date().toLocaleString();
+
+      // Badge
+      perfilBadge.textContent = categoria;
       perfilBadge.className = 'profile-badge';
-      if (clasificacion === 'Eficiente') perfilBadge.classList.add('badge-eficiente');
-      else if (clasificacion === 'Moderado') perfilBadge.classList.add('badge-moderado');
-      else if (clasificacion === 'Ineficiente') perfilBadge.classList.add('badge-ineficiente');
+      if (categoria === 'Eficiente') perfilBadge.classList.add('badge-eficiente');
+      else if (categoria === 'Moderado') perfilBadge.classList.add('badge-moderado');
+      else if (categoria === 'Ineficiente') perfilBadge.classList.add('badge-ineficiente');
 
-      clasificacionTexto.textContent = `· ${pais} ${anio} · Perfil ${perfil} · ${horasPico}h pico · ${equipos} equipos`;
+      clasificacionTexto.textContent = `${metadatos.pais} ${metadatos.anio} · ${metadatos.tipo_inmueble} · ${metadatos.horas_alto_consumo}h pico`;
+      resultadoFecha.textContent = ahora;
 
-      consumoEstimado.innerHTML = `${consumo.toFixed(1)} <small>kWh</small>`;
-      costoMensual.innerHTML = `${moneda} ${costo.toFixed(2)}`;
-      indiceEficiencia.innerHTML = `${eficiencia} <small>%</small>`;
+      // Stats
+      categoriaOutput.textContent = categoria;
+      probabilidadOutput.textContent = `${(probabilidad * 100).toFixed(0)}%`;
+      costoEstimado.textContent = `${moneda} ${costo_estimado_mensual.toFixed(2)}`;
+      costoReferencia.textContent = `${moneda} ${costo_referencia_brief.toFixed(2)} (brief)`;
+      co2Evitable.textContent = `${co2_evitable_kg_mes.toFixed(1)} kg/mes`;
       
-      // Mostrar comparación con promedio del país
-      let vsColor = '';
-      if (vs < 75) vsColor = 'var(--success)';
-      else if (vs < 125) vsColor = 'var(--warning)';
-      else vsColor = 'var(--danger)';
-      vsPromedio.innerHTML = `<span style="color:${vsColor}">${vs}%</span> <small>del promedio (${promedioPais} kWh)</small>`;
+      let eficienciaColor = '';
+      if (metadatos.eficiencia >= 80) eficienciaColor = 'var(--success)';
+      else if (metadatos.eficiencia >= 50) eficienciaColor = 'var(--warning)';
+      else eficienciaColor = 'var(--danger)';
+      indiceEficiencia.innerHTML = `<span style="color:${eficienciaColor}">${metadatos.eficiencia}%</span>`;
 
+      // Recomendaciones
       recoList.innerHTML = '';
       if (recomendaciones.length === 0) {
         recoList.innerHTML = '<li>Sin recomendaciones adicionales.</li>';
@@ -1202,40 +1613,67 @@
         });
       }
 
+      // Observaciones
+      observationsList.innerHTML = '';
+      if (observaciones.length === 0) {
+        observationsList.innerHTML = '<li>Sin observaciones.</li>';
+      } else {
+        observaciones.forEach(o => {
+          const li = document.createElement('li');
+          li.textContent = o;
+          observationsList.appendChild(li);
+        });
+      }
+
+      // JSON (estructura compatible con el endpoint)
       const jsonObj = {
-        perfil: clasificacion,
-        consumo_mensual_kwh: parseFloat(consumo.toFixed(1)),
-        costo_estimado: `${moneda} ${costo.toFixed(2)}`,
-        eficiencia_porcentaje: eficiencia,
-        vs_promedio_pais: `${vs}%`,
-        pais: pais,
-        anio: anio,
+        categoria: categoria,
+        probabilidad: probabilidad,
+        costo_estimado_mensual: costo_estimado_mensual,
+        costo_referencia_brief: costo_referencia_brief,
+        co2_evitable_kg_mes: co2_evitable_kg_mes,
         recomendaciones: recomendaciones,
-        aparatos: aparatos.map(a => ({ 
-          nombre: a.nombre, 
-          consumo_kwh: parseFloat(a.consumo) || 0, 
-          cantidad: parseInt(a.cantidad) || 0 
-        })),
-        metadatos: { perfil_uso: perfil, horas_pico: horasPico, equipos: equipos }
+        observaciones: observaciones,
+        metadatos: metadatos
       };
       jsonOutput.textContent = JSON.stringify(jsonObj, null, 2);
     }
 
-    // ----- guardar en historial -----
-    function guardarEnHistorial(resultado) {
+    // ============================================================
+    // HISTORIAL
+    // ============================================================
+    function guardarEnHistorial(resultado, datosPais, consumo, tipo, horasPico, usoPico, mesVal, region) {
       const entrada = {
         id: Date.now() + '_' + Math.random().toString(36).substr(2, 6),
         fecha: new Date().toLocaleString(),
-        ...resultado,
-        aparatos: aparatos.map(a => ({ 
-          nombre: a.nombre, 
-          consumo: parseFloat(a.consumo) || 0, 
-          cantidad: parseInt(a.cantidad) || 0 
-        }))
+        categoria: resultado.categoria,
+        probabilidad: resultado.probabilidad,
+        consumo: consumo,
+        costo: resultado.costo_estimado_mensual,
+        moneda: resultado.metadatos.moneda,
+        pais: resultado.metadatos.pais,
+        anio: resultado.metadatos.anio,
+        tipo: tipo,
+        horasPico: horasPico,
+        usoPico: usoPico,
+        mes: mesVal,
+        region: region,
+        recomendaciones: resultado.recomendaciones.slice(0, 3)
       };
       historial.unshift(entrada);
       guardarHistorial();
       renderizarHistorial();
+    }
+
+    function cargarHistorial() {
+      try {
+        const data = localStorage.getItem(STORAGE_KEY);
+        historial = data ? JSON.parse(data) : [];
+      } catch { historial = []; }
+    }
+
+    function guardarHistorial() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(historial));
     }
 
     function renderizarHistorial() {
@@ -1251,19 +1689,18 @@
         const div = document.createElement('div');
         div.className = 'historial-item';
         div.style.borderLeftColor = 
-          item.clasificacion === 'Eficiente' ? 'var(--badge-eficiente)' :
-          item.clasificacion === 'Moderado' ? 'var(--badge-moderado)' : 'var(--badge-ineficiente)';
+          item.categoria === 'Eficiente' ? 'var(--badge-eficiente)' :
+          item.categoria === 'Moderado' ? 'var(--badge-moderado)' : 'var(--badge-ineficiente)';
 
         const infoDiv = document.createElement('div');
         infoDiv.className = 'h-info';
 
         const badgeSpan = document.createElement('span');
-        badgeSpan.className = `h-badge ${item.clasificacion.toLowerCase()}`;
-        badgeSpan.textContent = item.clasificacion;
+        badgeSpan.className = `h-badge ${item.categoria.toLowerCase()}`;
+        badgeSpan.textContent = item.categoria;
 
         const detalle = document.createElement('span');
-        const aparatosStr = item.aparatos ? item.aparatos.length : 0;
-        detalle.textContent = `${item.consumo.toFixed(1)} kWh · ${item.moneda} ${item.costo.toFixed(2)} · ${item.pais} ${item.anio} · ${aparatosStr} aparatos`;
+        detalle.textContent = `${item.consumo} kWh · ${item.moneda} ${item.costo.toFixed(2)} · ${item.pais} ${item.anio} · ${item.tipo}`;
 
         const fechaSpan = document.createElement('span');
         fechaSpan.className = 'h-fecha';
@@ -1305,41 +1742,210 @@
       }
     }
 
-    // ----- ejecutar análisis -----
-    function ejecutarAnalisis() {
-      const { total, cantidad } = calcularTotales();
-      const horasPico = parseFloat(horasPicoInput.value) || 0;
-      const perfil = perfilUsoSelect.value;
+    // ============================================================
+    // ACTUALIZAR DATOS DEL PAÍS
+    // ============================================================
+    function actualizarInfoPais() {
       const pais = paisSelect.value;
       const anio = anioSelect.value;
-
-      if (total <= 0 || cantidad <= 0) {
-        alert('Por favor, agrega al menos un aparato con consumo > 0.');
+      const datos = obtenerDatosPais(pais, anio);
+      
+      if (!datos) {
+        mostrarToast('Error', 'No hay datos disponibles para este país/año', 'error');
         return;
       }
 
-      if (horasPico < 0) {
-        alert('Las horas pico no pueden ser negativas.');
-        return;
-      }
+      consumoAnual.textContent = datos.consumo_anual.toLocaleString();
+      promedioMensual.textContent = datos.promedio_mensual;
+      tarifaPais.textContent = `${datos.moneda} ${datos.tarifa.toFixed(2)}`;
+      monedaPais.textContent = datos.moneda;
+      factorCO2.textContent = datos.factor_co2.toFixed(2);
 
-      const resultado = analizarConsumo(total, horasPico, cantidad, perfil, pais, anio);
-      renderizar(resultado);
-      guardarEnHistorial(resultado);
-      mostrarToast('✅ Análisis completado', `Clasificación: ${resultado.clasificacion}`);
+      guardarPaisSeleccionado();
     }
 
-    // ----- resetear valores -----
-    function resetearValores() {
-      horasPicoInput.value = DEFAULT.horasPico;
-      perfilUsoSelect.value = DEFAULT.perfil;
-      paisSelect.value = DEFAULT.pais;
-      anioSelect.value = DEFAULT.anio;
+    function cargarPaisSeleccionado() {
+      try {
+        const data = localStorage.getItem(PAIS_KEY);
+        if (data) {
+          const parsed = JSON.parse(data);
+          paisSelect.value = parsed.pais || 'Peru';
+          anioSelect.value = parsed.anio || '2022';
+        }
+      } catch {}
+    }
+
+    function guardarPaisSeleccionado() {
+      localStorage.setItem(PAIS_KEY, JSON.stringify({
+        pais: paisSelect.value,
+        anio: anioSelect.value
+      }));
+    }
+
+    // ============================================================
+    // ZONAS
+    // ============================================================
+    function cargarZonas() {
+      try {
+        const data = localStorage.getItem(ZONAS_KEY);
+        zonas = data ? JSON.parse(data) : [];
+      } catch { zonas = []; }
+    }
+
+    function guardarZonas() {
+      localStorage.setItem(ZONAS_KEY, JSON.stringify(zonas));
+    }
+
+    function renderizarZonas() {
+      zonasContainer.innerHTML = '';
+      if (zonas.length === 0) {
+        zonasContainer.innerHTML = '<div class="historial-vacio" id="sinZonasMsg">Agrega zonas para análisis más detallado (opcional)</div>';
+        zonasCount.textContent = '0 zonas';
+        return;
+      }
+      zonasCount.textContent = `${zonas.length} zonas`;
+
+      zonas.forEach((zona, index) => {
+        const div = document.createElement('div');
+        div.className = 'historial-item';
+        div.style.borderLeftColor = 'var(--accent)';
+
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'h-info';
+
+        const nombreSpan = document.createElement('strong');
+        nombreSpan.textContent = zona.nombre || `Zona ${index + 1}`;
+
+        const detalle = document.createElement('span');
+        detalle.textContent = `${zona.equipos || 0} equipos · ${zona.horas_uso || 0}h/día`;
+
+        infoDiv.appendChild(nombreSpan);
+        infoDiv.appendChild(detalle);
+
+        const btnEliminar = document.createElement('button');
+        btnEliminar.className = 'btn-danger-small';
+        btnEliminar.textContent = '✕ Eliminar';
+        btnEliminar.addEventListener('click', function() {
+          zonas.splice(index, 1);
+          guardarZonas();
+          renderizarZonas();
+        });
+
+        div.appendChild(infoDiv);
+        div.appendChild(btnEliminar);
+        zonasContainer.appendChild(div);
+      });
+    }
+
+    function agregarZona() {
+      const nombre = prompt('Nombre de la zona (ej: Cocina, Sala, Dormitorio):');
+      if (nombre === null) return;
+      const equipos = parseInt(prompt('Número de equipos en esta zona:') || '0');
+      const horasUso = parseFloat(prompt('Horas de uso diario:') || '0');
+      
+      zonas.push({
+        nombre: nombre || `Zona ${zonas.length + 1}`,
+        equipos: equipos || 0,
+        horas_uso: horasUso || 0
+      });
+      guardarZonas();
+      renderizarZonas();
+      mostrarToast('✅ Zona agregada', `Se añadió "${nombre || 'Zona'}"`);
+    }
+
+    // ============================================================
+    // TOGGLE AVANZADO
+    // ============================================================
+    function toggleAdvanced() {
+      const visible = advancedToggle.checked;
+      document.querySelectorAll('.advanced-field').forEach(el => {
+        el.classList.toggle('visible', visible);
+      });
+    }
+
+    // ============================================================
+    // CARGAR EJEMPLO
+    // ============================================================
+    function cargarEjemplo() {
+      tipoInmueble.value = 'Casa';
+      consumoKwh.value = '420';
+      usoHorarioPico.value = 'true';
+      horasAltoConsumo.value = '6';
+      mes.value = 'Julio';
+      regionPais.value = 'Costa';
+      superficieM2.value = '120';
+      habitantes.value = '4';
+      casaInteligente.value = 'true';
+      sensoresIot.value = 'true';
+      mantenimientoGeneral.value = 'false';
+      panelesSolares.value = 'false';
+      cargadorVe.value = 'false';
+      factorPotencia.value = '0.86';
+      capacidadSolar.value = '0';
+      tieneBaterias.value = 'false';
+      tipoConexion.value = 'Monofásico';
+      distribuidora.value = 'Luz del Sur';
+      usaTarifaPersonalizada.value = 'false';
+      tarifaPersonalizada.value = '0.68';
+      paisSelect.value = 'Peru';
+      anioSelect.value = '2022';
+      
       actualizarInfoPais();
-      mostrarToast('↺ Valores restablecidos', 'Se cargaron los valores por defecto');
+      mostrarToast('📋 Ejemplo cargado', 'Datos de ejemplo listos para analizar');
+      
+      // Ejecutar análisis automáticamente
+      setTimeout(ejecutarAnalisis, 300);
     }
 
-    // ----- theme toggle -----
+    // ============================================================
+    // RESET
+    // ============================================================
+    function resetearTodo() {
+      tipoInmueble.value = 'Casa';
+      consumoKwh.value = '0';
+      usoHorarioPico.value = 'false';
+      horasAltoConsumo.value = '0';
+      mes.value = 'Julio';
+      regionPais.value = '';
+      superficieM2.value = '0';
+      habitantes.value = '0';
+      casaInteligente.value = 'false';
+      sensoresIot.value = 'false';
+      mantenimientoGeneral.value = 'false';
+      panelesSolares.value = 'false';
+      cargadorVe.value = 'false';
+      factorPotencia.value = '0.86';
+      capacidadSolar.value = '0';
+      tieneBaterias.value = 'false';
+      tipoConexion.value = 'Monofásico';
+      distribuidora.value = '';
+      usaTarifaPersonalizada.value = 'false';
+      tarifaPersonalizada.value = '0';
+      paisSelect.value = 'Peru';
+      anioSelect.value = '2022';
+      
+      actualizarInfoPais();
+      mostrarToast('↺ Restablecido', 'Todos los valores fueron restablecidos');
+      
+      // Limpiar resultados
+      perfilBadge.textContent = '—';
+      perfilBadge.className = 'profile-badge';
+      clasificacionTexto.textContent = 'Esperando análisis...';
+      categoriaOutput.textContent = '—';
+      probabilidadOutput.textContent = '—';
+      costoEstimado.textContent = '—';
+      costoReferencia.textContent = '—';
+      co2Evitable.textContent = '—';
+      indiceEficiencia.textContent = '—';
+      recoList.innerHTML = '<li>Completa los campos obligatorios y haz clic en "Analizar".</li>';
+      observationsList.innerHTML = '<li>Sin observaciones.</li>';
+      jsonOutput.textContent = JSON.stringify({ mensaje: 'Esperando datos...' }, null, 2);
+      resultadoFecha.textContent = '—';
+    }
+
+    // ============================================================
+    // THEME
+    // ============================================================
     function toggleTheme() {
       const html = document.documentElement;
       const current = html.getAttribute('data-theme');
@@ -1354,42 +1960,63 @@
       }
     }
 
-    // ----- eventos -----
-    analizarBtn.addEventListener('click', ejecutarAnalisis);
-    resetBtn.addEventListener('click', resetearValores);
-    themeToggle.addEventListener('click', toggleTheme);
-    borrarTodoBtn.addEventListener('click', borrarTodoHistorial);
-    agregarAparatoBtn.addEventListener('click', agregarAparato);
-    resetAparatosBtn.addEventListener('click', resetearAparatos);
-    actualizarDatosBtn.addEventListener('click', actualizarInfoPais);
+    // ============================================================
+    // EVENTOS E INICIALIZACIÓN
+    // ============================================================
+    async function init() {
+      // Cargar datos desde GitHub
+      await cargarDatosDesdeGitHub();
 
-    // Cambio de país/año actualiza info automáticamente
-    paisSelect.addEventListener('change', actualizarInfoPais);
-    anioSelect.addEventListener('change', actualizarInfoPais);
+      // Cargar estado guardado
+      cargarHistorial();
+      cargarZonas();
+      cargarPaisSeleccionado();
 
-    // Enter en campos dispara análisis
-    [horasPicoInput, perfilUsoSelect, paisSelect, anioSelect].forEach(el => {
-      el.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') ejecutarAnalisis();
+      // Renderizar
+      renderizarHistorial();
+      renderizarZonas();
+      actualizarInfoPais();
+
+      // Toggle avanzado
+      advancedToggle.checked = false;
+      toggleAdvanced();
+
+      // Eventos
+      analizarBtn.addEventListener('click', ejecutarAnalisis);
+      resetBtn.addEventListener('click', resetearTodo);
+      cargarEjemploBtn.addEventListener('click', cargarEjemplo);
+      actualizarDatosBtn.addEventListener('click', async () => {
+        await cargarDatosDesdeGitHub();
+        actualizarInfoPais();
       });
-    });
+      borrarTodoBtn.addEventListener('click', borrarTodoHistorial);
+      agregarZonaBtn.addEventListener('click', agregarZona);
+      themeToggle.addEventListener('click', toggleTheme);
+      advancedToggle.addEventListener('change', toggleAdvanced);
 
-    // ----- inicialización -----
-    cargarHistorial();
-    renderizarHistorial();
-    cargarAparatos();
-    renderizarAparatos();
-    cargarPaisSeleccionado();
+      paisSelect.addEventListener('change', () => {
+        actualizarInfoPais();
+        guardarPaisSeleccionado();
+      });
+      anioSelect.addEventListener('change', () => {
+        actualizarInfoPais();
+        guardarPaisSeleccionado();
+      });
 
-    // Valores por defecto
-    horasPicoInput.value = DEFAULT.horasPico;
-    perfilUsoSelect.value = DEFAULT.perfil;
+      // Enter en campos clave
+      [consumoKwh, horasAltoConsumo].forEach(el => {
+        el.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') ejecutarAnalisis();
+        });
+      });
 
-    // Actualizar info del país
-    actualizarInfoPais();
+      console.log('⚡ Análisis Energético · Hackathon');
+      console.log('📊 Datos cargados desde:', DATOS_GITHUB_URL);
+      console.log('🌍 Países disponibles:', Object.keys(DATOS_PAISES));
+    }
 
-    // Mostrar vista previa inicial
-    setTimeout(actualizarVistaPrevia, 200);
+    // Iniciar
+    init();
 
   })();
 </script>
